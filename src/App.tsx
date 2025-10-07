@@ -108,7 +108,7 @@ function App() {
       <Header />
 
       {/* Main game area */}
-      <main className="flex-1 flex flex-col items-center justify-between max-w-lg mx-auto w-full p-4">
+      <main className="flex-1 flex flex-col items-center justify-between max-w-lg mx-auto w-full px-2 py-3">
         <Grid />
         <Keyboard />
       </main>

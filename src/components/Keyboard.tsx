@@ -65,26 +65,25 @@ const Key: React.FC<KeyProps> = ({
       onClick={onClick}
       disabled={isDisabled}
       className={`
-        ${isSpecialKey ? "px-4" : "px-3"} py-4
-        rounded font-bold text-sm
+        ${isSpecialKey ? "px-3 flex-[1.5]" : "px-1.5 flex-1"} py-3
+        rounded font-bold text-xs
         ${getBackgroundColor()}
         transition-colors duration-200
         flex items-center justify-center
-        min-w-[40px]
         ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
       `}
       aria-label={value}
     >
       {value === "BACKSPACE" ? (
-        <Delete size={20} />
+        <Delete size={18} />
       ) : value === "ENTER" ? (
         isLoading ? (
           <Loader2
-            size={20}
+            size={18}
             className="animate-spin"
           />
         ) : (
-          <CornerDownLeft size={20} />
+          <CornerDownLeft size={18} />
         )
       ) : (
         value
@@ -130,7 +129,7 @@ const Keyboard: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-lg px-2 pb-4">
+    <div className="w-full max-w-lg px-1 pb-2">
       {KEYBOARD_ROWS.map((row, rowIndex) => (
         <div
           key={rowIndex}
