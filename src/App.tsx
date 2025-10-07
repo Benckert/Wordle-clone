@@ -14,13 +14,14 @@ import Keyboard from '@/components/Keyboard';
 import HelpModal from '@/components/HelpModal';
 import GameStats from '@/components/GameStats';
 import WinOverlay from "@/components/WinOverlay"
-import { useGameStore } from '@/stores/gameStore';
-import { GameStatus } from '@/types/game.types';
-import './App.css';
+import LoseOverlay from "@/components/LoseOverlay"
+import { useGameStore } from "@/stores/gameStore"
+import { GameStatus } from "@/types/game.types"
+import "./App.css"
 
 /**
  * App Component
- * 
+ *
  * Features:
  * - Physical keyboard input handling
  * - Toast notifications for errors and game end
@@ -78,22 +79,6 @@ function App() {
   }, [invalidWord])
 
   /**
-   * Game Over Toast Notifications
-   *
-   * Shows failure message when game ends
-   * Delayed to allow tile flip animation to complete
-   */
-  useEffect(() => {
-    if (gameStatus === GameStatus.LOST) {
-      setTimeout(() => {
-        toast.error("Better luck next time!", {
-          duration: 3000,
-        })
-      }, 1500)
-    }
-  }, [gameStatus])
-
-  /**
    * First Visit Help Modal
    *
    * Automatically shows help modal on first visit
@@ -122,8 +107,9 @@ function App() {
       <HelpModal />
       <GameStats />
 
-      {/* Win Overlay */}
+      {/* Game End Overlays */}
       <WinOverlay />
+      <LoseOverlay />
 
       {/* Toast notifications */}
       <Toaster position="top-center" />

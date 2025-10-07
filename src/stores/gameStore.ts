@@ -221,7 +221,6 @@ export const useGameStore = create<GameStore>()(
           currentRow: currentRow + 1,
           gameStatus: newGameStatus,
           stats: newStats,
-          showStats: hasLost, // Only auto-show stats on loss, not on win
           isValidating: false,
         })
         console.log("[submitGuess] State updated, isValidating set to false")
