@@ -42,23 +42,51 @@ const initialStats: GameStats = {
  *
  * Central state management for the entire Wordle game.
  * Handles all game logic, state updates, and persistence.
+ * Maintains separate game states for each word length (5, 6, 7).
  */
 export const useGameStore = create<GameStore>()(
   persist(
-    (set, get) => ({
-      // ============= INITIAL STATE =============
+    (set, get) => {
+      // Initialize with default state for first load
+      const initialGameStates = {
+        5: {
+          targetWord: getTodaysWord(5),
+          currentGuess: "",
+          guesses: [],
+          currentRow: 0,
+          gameStatus: GameStatus.PLAYING,
+        },
+        6: {
+          targetWord: getTodaysWord(6),
+          currentGuess: "",
+          guesses: [],
+          currentRow: 0,
+          gameStatus: GameStatus.PLAYING,
+        },
+        7: {
+          targetWord: getTodaysWord(7),
+          currentGuess: "",
+          guesses: [],
+          currentRow: 0,
+          gameStatus: GameStatus.PLAYING,
+        },
+      }
 
-      targetWord: getTodaysWord(),
-      currentGuess: "",
-      guesses: [],
-      currentRow: 0,
-      gameStatus: GameStatus.PLAYING,
-      stats: initialStats,
-      showStats: false,
-      showHelp: false,
-      invalidWord: false,
-      isValidating: false,
-      wordLength: DEFAULT_WORD_LENGTH,
+      return {
+        // ============= INITIAL STATE =============
+
+        targetWord: getTodaysWord(DEFAULT_WORD_LENGTH),
+        currentGuess: "",
+        guesses: [],
+        currentRow: 0,
+        gameStatus: GameStatus.PLAYING,
+        stats: initialStats,
+        showStats: false,
+        showHelp: false,
+        invalidWord: false,
+        isValidating: false,
+        wordLength: DEFAULT_WORD_LENGTH,
+        gameStates: initialGameStates,
 
       // ============= ACTIONS =============
 
@@ -212,14 +240,23 @@ export const useGameStore = create<GameStore>()(
       /**
        * Reset the game
        *
-       * Resets all game state to initial values.
+       * Resets the current word length game state.
        * Gets a new random word for "play again" functionality.
        * Statistics are preserved.
        */
       resetGame: () => {
-        const { wordLength } = get()
+        const { wordLength, gameStates } = get()
         const newWord = getRandomWord(wordLength)
         console.log("[resetGame] New target word selected:", newWord)
+        
+        const newGameState = {
+          targetWord: newWord,
+          currentGuess: "",
+          guesses: [],
+          currentRow: 0,
+          gameStatus: GameStatus.PLAYING,
+        }
+        
         set({
           targetWord: newWord,
           currentGuess: "",
@@ -229,24 +266,48 @@ export const useGameStore = create<GameStore>()(
           invalidWord: false,
           isValidating: false,
           showStats: false,
+          gameStates: {
+            ...gameStates,
+            [wordLength]: newGameState,
+          },
         })
       },
 
       /**
-       * Set word length and start new game
+       * Set word length and switch to that game
+       * Preserves the state of the current game before switching
        * 
        * @param {number} length - Word length (5, 6, or 7)
        */
       setWordLength: (length: number) => {
-        const newWord = getRandomWord(length)
-        console.log(`[setWordLength] Changing to ${length}-letter words. New word:`, newWord)
+        const { wordLength: currentLength, gameStates, targetWord, currentGuess, guesses, currentRow, gameStatus } = get()
+        
+        // Save current game state before switching
+        const updatedGameStates = {
+          ...gameStates,
+          [currentLength]: {
+            targetWord,
+            currentGuess,
+            guesses,
+            currentRow,
+            gameStatus,
+          },
+        }
+        
+        // Load the game state for the new word length
+        const newGameState = updatedGameStates[length]
+        
+        console.log(`[setWordLength] Switching from ${currentLength} to ${length}-letter mode`)
+        console.log(`[setWordLength] Loaded state:`, newGameState)
+        
         set({
           wordLength: length,
-          targetWord: newWord,
-          currentGuess: "",
-          guesses: [],
-          currentRow: 0,
-          gameStatus: GameStatus.PLAYING,
+          targetWord: newGameState.targetWord,
+          currentGuess: newGameState.currentGuess,
+          guesses: newGameState.guesses,
+          currentRow: newGameState.currentRow,
+          gameStatus: newGameState.gameStatus,
+          gameStates: updatedGameStates,
           invalidWord: false,
           isValidating: false,
           showStats: false,
@@ -262,14 +323,35 @@ export const useGameStore = create<GameStore>()(
        * Toggle help modal visibility
        */
       toggleHelp: () => set((state) => ({ showHelp: !state.showHelp })),
-    }),
+      }
+    },
     {
       name: "wordle-game-storage",
-      // Only persist statistics to localStorage
-      // Game state resets on each session
+      // Persist statistics and game states to localStorage
       partialize: (state) => ({
         stats: state.stats,
+        gameStates: state.gameStates,
+        wordLength: state.wordLength,
       }),
+      // Custom merge to restore the active game from saved gameStates
+      merge: (persistedState: any, currentState: GameStore) => {
+        const merged = { ...currentState, ...persistedState }
+        
+        // If we have saved gameStates and a wordLength, restore that game
+        if (merged.gameStates && merged.wordLength && merged.gameStates[merged.wordLength]) {
+          const savedGame = merged.gameStates[merged.wordLength]
+          return {
+            ...merged,
+            targetWord: savedGame.targetWord,
+            currentGuess: savedGame.currentGuess,
+            guesses: savedGame.guesses,
+            currentRow: savedGame.currentRow,
+            gameStatus: savedGame.gameStatus,
+          }
+        }
+        
+        return merged
+      },
     }
   )
 )

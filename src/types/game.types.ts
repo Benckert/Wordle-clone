@@ -63,6 +63,16 @@ export interface GameState {
   invalidWord: boolean
   isValidating: boolean
   wordLength: number
+  // Separate game states for each word length
+  gameStates: {
+    [key: number]: {
+      targetWord: string
+      currentGuess: string
+      guesses: Guess[]
+      currentRow: number
+      gameStatus: GameStatus
+    }
+  }
 }
 
 /**
