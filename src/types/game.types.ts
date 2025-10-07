@@ -62,6 +62,7 @@ export interface GameState {
   showHelp: boolean
   invalidWord: boolean
   isValidating: boolean
+  wordLength: number
 }
 
 /**
@@ -76,6 +77,7 @@ export interface GameActions {
   resetGame: () => void
   toggleStats: () => void
   toggleHelp: () => void
+  setWordLength: (length: number) => void
 }
 
 /**

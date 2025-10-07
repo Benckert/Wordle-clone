@@ -5,9 +5,14 @@
  */
 
 /**
- * Word length - all words must be 5 letters
+ * Word length options
  */
-export const WORD_LENGTH = 5 as const;
+export const WORD_LENGTHS = [5, 6, 7] as const;
+
+/**
+ * Default word length
+ */
+export const DEFAULT_WORD_LENGTH = 5 as const;
 
 /**
  * Maximum number of guesses allowed

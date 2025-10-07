@@ -1,8 +1,16 @@
 /**
  * Game Store - Zustand State Management
  * 
- * This file contains the global game state and all game actions.
- * Uses Zustand for simple, performant state management.
+ * This file contains the global game state and all game a      submitGuess: async () => {
+        const { currentGuess, targetWord, guesses, currentRow, stats, wordLength } = get()
+
+        console.log('[submitGuess] Starting validation for:', currentGuess)
+
+        // Validation: Check word length
+        if (currentGuess.length !== wordLength) {
+          console.log('[submitGuess] Word length invalid')
+          return
+        }* Uses Zustand for simple, performant state management.
  * Statistics are persisted to localStorage.
  */
 
@@ -14,7 +22,7 @@ import {
   getKeyboardStatus,
   isWinningGuess,
 } from "@/utils/gameLogic"
-import { WORD_LENGTH, MAX_ATTEMPTS } from "@/utils/constants"
+import { DEFAULT_WORD_LENGTH, MAX_ATTEMPTS } from "@/utils/constants"
 import { GameStatus } from "@/types/game.types"
 import type { GameStore, GameStats, KeyboardStatus } from "@/types/game.types"
 
@@ -50,6 +58,7 @@ export const useGameStore = create<GameStore>()(
       showHelp: false,
       invalidWord: false,
       isValidating: false,
+      wordLength: DEFAULT_WORD_LENGTH,
 
       // ============= ACTIONS =============
 
@@ -58,14 +67,14 @@ export const useGameStore = create<GameStore>()(
        *
        * Only adds if:
        * - Game is still in PLAYING state
-       * - Current guess is less than WORD_LENGTH
+       * - Current guess is less than wordLength
        *
        * @param {string} letter - Letter to add (automatically uppercased)
        */
       addLetter: (letter: string) => {
-        const { currentGuess, gameStatus } = get()
+        const { currentGuess, gameStatus, wordLength } = get()
         if (gameStatus !== GameStatus.PLAYING) return
-        if (currentGuess.length < WORD_LENGTH) {
+        if (currentGuess.length < wordLength) {
           set({
             currentGuess: currentGuess + letter.toUpperCase(),
             invalidWord: false,
@@ -108,12 +117,12 @@ export const useGameStore = create<GameStore>()(
        * 6. Shows stats modal if game ends
        */
       submitGuess: async () => {
-        const { currentGuess, targetWord, guesses, currentRow, stats } = get()
+        const { currentGuess, targetWord, guesses, currentRow, stats, wordLength } = get()
 
         console.log("[submitGuess] Starting validation for:", currentGuess)
 
         // Validation: Check word length
-        if (currentGuess.length !== WORD_LENGTH) {
+        if (currentGuess.length !== wordLength) {
           console.log("[submitGuess] Word length invalid")
           return
         }
@@ -207,9 +216,31 @@ export const useGameStore = create<GameStore>()(
        * Statistics are preserved.
        */
       resetGame: () => {
-        const newWord = getRandomWord()
+        const { wordLength } = get()
+        const newWord = getRandomWord(wordLength)
         console.log("[resetGame] New target word selected:", newWord)
         set({
+          targetWord: newWord,
+          currentGuess: "",
+          guesses: [],
+          currentRow: 0,
+          gameStatus: GameStatus.PLAYING,
+          invalidWord: false,
+          isValidating: false,
+          showStats: false,
+        })
+      },
+
+      /**
+       * Set word length and start new game
+       * 
+       * @param {number} length - Word length (5, 6, or 7)
+       */
+      setWordLength: (length: number) => {
+        const newWord = getRandomWord(length)
+        console.log(`[setWordLength] Changing to ${length}-letter words. New word:`, newWord)
+        set({
+          wordLength: length,
           targetWord: newWord,
           currentGuess: "",
           guesses: [],

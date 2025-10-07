@@ -2,11 +2,10 @@
  * Row Component
  * 
  * Represents a single row of tiles in the Wordle grid.
- * Contains 5 tiles, one for each letter.
+ * Contains tiles based on the current word length.
  */
 
 import Tile from './Tile';
-import { WORD_LENGTH } from '@/utils/constants';
 import { TileStatus } from '@/types/game.types';
 
 interface RowProps {
@@ -18,25 +17,28 @@ interface RowProps {
   isCurrentRow: boolean;
   /** Whether the current guess is invalid (triggers shake animation) */
   isInvalid: boolean;
+  /** Length of the word */
+  wordLength: number;
 }
 
 /**
  * Row Component
  * 
- * Renders a row of 5 tiles, managing their display state based on
+ * Renders a row of tiles based on wordLength, managing their display state based on
  * whether the row is empty, filled, or evaluated.
  */
 const Row: React.FC<RowProps> = ({ 
   word = '', 
   evaluation = [], 
   isCurrentRow, 
-  isInvalid 
+  isInvalid,
+  wordLength
 }) => {
-  // Create array of 5 tiles
-  const tiles: string[] = Array(WORD_LENGTH).fill('');
+  // Create array of tiles based on word length
+  const tiles: string[] = Array(wordLength).fill('');
   
   // Fill in letters from the word
-  for (let i = 0; i < WORD_LENGTH; i++) {
+  for (let i = 0; i < wordLength; i++) {
     tiles[i] = word[i] || '';
   }
   
@@ -67,6 +69,7 @@ const Row: React.FC<RowProps> = ({
           status={getTileStatus(index)}
           position={index}
           isInvalid={isInvalid && isCurrentRow}
+          wordLength={wordLength}
         />
       ))}
     </div>

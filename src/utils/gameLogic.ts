@@ -20,8 +20,8 @@ import type { Guess, KeyboardStatus } from '@/types/game.types';
  * in the guess but only once in the target, only one instance will be marked
  * as correct/present.
  * 
- * @param {string} guess - The guessed word (5 letters)
- * @param {string} target - The target word (5 letters)
+ * @param {string} guess - The guessed word
+ * @param {string} target - The target word
  * @returns {TileStatus[]} Array of tile statuses for each letter
  * 
  * @example
@@ -29,7 +29,8 @@ import type { Guess, KeyboardStatus } from '@/types/game.types';
  * // Returns: [CORRECT, CORRECT, CORRECT, ABSENT, ABSENT]
  */
 export const evaluateGuess = (guess: string, target: string): TileStatus[] => {
-  const result: TileStatus[] = Array(5).fill(TileStatus.ABSENT);
+  const wordLength = guess.length;
+  const result: TileStatus[] = Array(wordLength).fill(TileStatus.ABSENT);
   const targetLetters = target.split('');
   const guessLetters = guess.split('');
   

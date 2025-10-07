@@ -19,10 +19,11 @@ import { MAX_ATTEMPTS } from '@/utils/constants';
  * 3. Empty - not yet reached
  */
 const Grid: React.FC = () => {
-  const { guesses, currentGuess, currentRow, invalidWord } = useGameStore();
-  
+  const { guesses, currentGuess, currentRow, invalidWord, wordLength } =
+    useGameStore()
+
   // Create array for all 6 rows
-  const rows = Array(MAX_ATTEMPTS).fill(null);
+  const rows = Array(MAX_ATTEMPTS).fill(null)
 
   return (
     <div className="flex flex-col items-center py-4">
@@ -36,9 +37,10 @@ const Grid: React.FC = () => {
               evaluation={guesses[index].evaluation}
               isCurrentRow={false}
               isInvalid={false}
+              wordLength={wordLength}
             />
-          );
-        } 
+          )
+        }
         // Current row - being typed
         else if (index === currentRow) {
           return (
@@ -48,9 +50,10 @@ const Grid: React.FC = () => {
               evaluation={[]}
               isCurrentRow={true}
               isInvalid={invalidWord}
+              wordLength={wordLength}
             />
-          );
-        } 
+          )
+        }
         // Empty row - not yet reached
         else {
           return (
@@ -60,12 +63,13 @@ const Grid: React.FC = () => {
               evaluation={[]}
               isCurrentRow={false}
               isInvalid={false}
+              wordLength={wordLength}
             />
-          );
+          )
         }
       })}
     </div>
-  );
+  )
 };
 
 export default Grid;

@@ -10,85 +10,110 @@ import { TileStatus } from '@/types/game.types';
 
 interface TileProps {
   /** The letter to display (empty string if no letter) */
-  letter: string;
+  letter: string
   /** Current status of the tile (empty, filled, correct, present, absent) */
-  status: TileStatus;
+  status: TileStatus
   /** Position in the word (0-4), used for staggered flip animation */
-  position: number;
+  position: number
   /** Whether this tile is part of an invalid word (triggers shake animation) */
-  isInvalid: boolean;
+  isInvalid: boolean
+  /** Word length to determine tile size */
+  wordLength?: number
 }
 
 /**
  * Tile Component
- * 
+ *
  * Features:
  * - Pop animation when letter is entered
  * - Flip animation when row is submitted
  * - Shake animation for invalid words
  * - Color-coded background based on letter correctness
+ * - Responsive sizing based on word length
  */
-const Tile: React.FC<TileProps> = ({ letter, status, position, isInvalid }) => {
+const Tile: React.FC<TileProps> = ({
+  letter,
+  status,
+  position,
+  isInvalid,
+  wordLength = 5,
+}) => {
+  /**
+   * Get size classes based on word length
+   * On mobile (< 640px): smaller tiles for longer words
+   * On larger screens (≥ 640px): keep consistent size
+   */
+  const getSizeClasses = (): string => {
+    switch (wordLength) {
+      case 7:
+        return "w-10 h-10 text-lg sm:w-14 sm:h-14 sm:text-2xl" // Smaller on mobile, standard on larger screens
+      case 6:
+        return "w-12 h-12 text-xl sm:w-14 sm:h-14 sm:text-2xl" // Medium on mobile, standard on larger screens
+      default:
+        return "w-14 h-14 text-2xl" // Standard for 5-letter words on all screens
+    }
+  }
+
   /**
    * Get background color class based on tile status
    */
   const getBackgroundColor = (): string => {
     switch (status) {
       case TileStatus.CORRECT:
-        return 'bg-correct';
+        return "bg-correct"
       case TileStatus.PRESENT:
-        return 'bg-present';
+        return "bg-present"
       case TileStatus.ABSENT:
-        return 'bg-absent';
+        return "bg-absent"
       case TileStatus.FILLED:
-        return 'bg-gray-200 dark:bg-gray-700 border-gray-400';
+        return "bg-gray-200 dark:bg-gray-700 border-gray-400"
       default:
-        return 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600';
+        return "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
     }
-  };
+  }
 
   /**
    * Get text color class based on tile status
    */
   const getTextColor = (): string => {
     return status === TileStatus.EMPTY || status === TileStatus.FILLED
-      ? 'text-gray-900 dark:text-white'
-      : 'text-white';
-  };
+      ? "text-gray-900 dark:text-white"
+      : "text-white"
+  }
 
   return (
     <motion.div
       className={`
-        w-14 h-14 border-2 flex items-center justify-center
-        text-2xl font-bold uppercase rounded
+        ${getSizeClasses()} border-2 flex items-center justify-center
+        font-bold uppercase rounded
         ${getBackgroundColor()} ${getTextColor()}
       `}
       initial={{ scale: 1 }}
       animate={{
         // Pop animation when letter is entered
         scale: letter && status === TileStatus.FILLED ? [1, 1.1, 1] : 1,
-        
+
         // Flip animation when tile is evaluated
-        rotateX: 
-          status !== TileStatus.EMPTY && status !== TileStatus.FILLED 
-            ? [0, 90, 0] 
+        rotateX:
+          status !== TileStatus.EMPTY && status !== TileStatus.FILLED
+            ? [0, 90, 0]
             : 0,
-        
+
         // Shake animation for invalid word
         x: isInvalid ? [0, -10, 10, -10, 10, 0] : 0,
       }}
       transition={{
         scale: { duration: 0.1 },
-        rotateX: { 
-          duration: 0.6, 
-          delay: position * 0.1 // Stagger the flip animation
+        rotateX: {
+          duration: 0.6,
+          delay: position * 0.1, // Stagger the flip animation
         },
         x: { duration: 0.4 },
       }}
     >
       {letter}
     </motion.div>
-  );
-};
+  )
+}
 
 export default Tile;
