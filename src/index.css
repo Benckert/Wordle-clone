@@ -55,3 +55,32 @@
     font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
   }
 }
+
+/* Sonner toast customization */
+@layer components {
+  /* Make toasts dismissible on click */
+  [data-sonner-toast] {
+    cursor: pointer !important;
+  }
+  
+  /* Position close button on the right */
+  [data-sonner-toast] [data-close-button] {
+    position: absolute !important;
+    top: 50% !important;
+    right: 0.5rem !important;
+    left: auto !important;
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    border: none !important;
+    color: rgb(156 163 175) !important;
+  }
+  
+  [data-sonner-toast] [data-close-button]:hover {
+    color: rgb(75 85 99) !important;
+  }
+  
+  /* Add padding to the right to make room for close button */
+  [data-sonner-toast] [data-content] {
+    padding-right: 2rem !important;
+  }
+}

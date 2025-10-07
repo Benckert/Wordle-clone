@@ -72,7 +72,7 @@ function App() {
   useEffect(() => {
     if (invalidWord) {
       toast.error("Not in word list", {
-        duration: 2000, // Auto-dismiss after 2 seconds
+        duration: 2000,
       })
     }
   }, [invalidWord])
@@ -85,13 +85,11 @@ function App() {
    */
   useEffect(() => {
     if (gameStatus === GameStatus.LOST) {
-      setTimeout(
-        () =>
-          toast.error("Better luck next time!", {
-            duration: 3000, // Auto-dismiss after 3 seconds
-          }),
-        1500
-      )
+      setTimeout(() => {
+        toast.error("Better luck next time!", {
+          duration: 3000,
+        })
+      }, 1500)
     }
   }, [gameStatus])
 
