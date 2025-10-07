@@ -80,19 +80,11 @@ function App() {
   /**
    * Game Over Toast Notifications
    *
-   * Shows success/failure message when game ends
+   * Shows failure message when game ends
    * Delayed to allow tile flip animation to complete
    */
   useEffect(() => {
-    if (gameStatus === GameStatus.WON) {
-      setTimeout(
-        () =>
-          toast.success("Congratulations! 🎉", {
-            duration: 3000, // Auto-dismiss after 3 seconds
-          }),
-        1500
-      )
-    } else if (gameStatus === GameStatus.LOST) {
+    if (gameStatus === GameStatus.LOST) {
       setTimeout(
         () =>
           toast.error("Better luck next time!", {

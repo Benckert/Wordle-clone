@@ -167,7 +167,7 @@ export const useGameStore = create<GameStore>()(
 
           if (!isValid) {
             console.log("[submitGuess] Word is invalid, setting states")
-            set({ invalidWord: true, isValidating: false })
+            set({ invalidWord: true, isValidating: false, currentGuess: "" })
             // Auto-clear invalid word flag after animation
             setTimeout(() => {
               console.log("[submitGuess] Clearing invalidWord flag")
@@ -177,7 +177,7 @@ export const useGameStore = create<GameStore>()(
           }
         } catch (error) {
           console.error("[submitGuess] Error validating word:", error)
-          set({ invalidWord: true, isValidating: false })
+          set({ invalidWord: true, isValidating: false, currentGuess: "" })
           setTimeout(() => set({ invalidWord: false }), 400)
           return
         }
