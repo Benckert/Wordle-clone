@@ -13,6 +13,7 @@ import Grid from '@/components/Grid';
 import Keyboard from '@/components/Keyboard';
 import HelpModal from '@/components/HelpModal';
 import GameStats from '@/components/GameStats';
+import WinOverlay from "@/components/WinOverlay"
 import { useGameStore } from '@/stores/gameStore';
 import { GameStatus } from '@/types/game.types';
 import './App.css';
@@ -70,7 +71,9 @@ function App() {
    */
   useEffect(() => {
     if (invalidWord) {
-      toast.error("Not in word list")
+      toast.error("Not in word list", {
+        duration: 2000, // Auto-dismiss after 2 seconds
+      })
     }
   }, [invalidWord])
 
@@ -82,9 +85,21 @@ function App() {
    */
   useEffect(() => {
     if (gameStatus === GameStatus.WON) {
-      setTimeout(() => toast.success("Congratulations! 🎉"), 1500)
+      setTimeout(
+        () =>
+          toast.success("Congratulations! 🎉", {
+            duration: 3000, // Auto-dismiss after 3 seconds
+          }),
+        1500
+      )
     } else if (gameStatus === GameStatus.LOST) {
-      setTimeout(() => toast.error("Better luck next time!"), 1500)
+      setTimeout(
+        () =>
+          toast.error("Better luck next time!", {
+            duration: 3000, // Auto-dismiss after 3 seconds
+          }),
+        1500
+      )
     }
   }, [gameStatus])
 
@@ -116,6 +131,9 @@ function App() {
       {/* Modals */}
       <HelpModal />
       <GameStats />
+
+      {/* Win Overlay */}
+      <WinOverlay />
 
       {/* Toast notifications */}
       <Toaster position="top-center" />
