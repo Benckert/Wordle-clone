@@ -129,7 +129,7 @@ const Keyboard: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-lg px-1 pb-2">
+    <div className="w-full max-w-lg px-1 pb-6">
       {KEYBOARD_ROWS.map((row, rowIndex) => (
         <div
           key={rowIndex}

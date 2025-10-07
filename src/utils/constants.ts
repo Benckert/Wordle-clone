@@ -19,10 +19,10 @@ export const MAX_ATTEMPTS = 6 as const;
  * Organized in three rows as they appear on a QWERTY keyboard
  */
 export const KEYBOARD_ROWS: readonly string[][] = [
-  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
-] as const;
+  ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+  ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+  ["BACKSPACE", "Z", "X", "C", "V", "B", "N", "M", "ENTER"],
+] as const
 
 /**
  * Animation durations in milliseconds
