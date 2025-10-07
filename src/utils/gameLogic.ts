@@ -34,11 +34,14 @@ export const evaluateGuess = (guess: string, target: string): TileStatus[] => {
   const targetLetters = target.split('');
   const guessLetters = guess.split('');
   
+  console.log('[evaluateGuess] Evaluating:', { guess, target, wordLength });
+  
   // First pass: mark correct letters (exact position match)
   guessLetters.forEach((letter, i) => {
     if (letter === targetLetters[i]) {
       result[i] = TileStatus.CORRECT;
       targetLetters[i] = ''; // Mark as used to prevent double counting
+      console.log(`[evaluateGuess] Position ${i}: ${letter} is CORRECT`);
     }
   });
   
@@ -49,10 +52,14 @@ export const evaluateGuess = (guess: string, target: string): TileStatus[] => {
       if (targetIndex !== -1) {
         result[i] = TileStatus.PRESENT;
         targetLetters[targetIndex] = ''; // Mark as used
+        console.log(`[evaluateGuess] Position ${i}: ${letter} is PRESENT`);
+      } else {
+        console.log(`[evaluateGuess] Position ${i}: ${letter} is ABSENT`);
       }
     }
   });
   
+  console.log('[evaluateGuess] Result:', result);
   return result;
 };
 

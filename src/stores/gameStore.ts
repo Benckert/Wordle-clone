@@ -155,6 +155,7 @@ export const useGameStore = create<GameStore>()(
         }
 
         // Evaluate the guess
+        console.log('[submitGuess] About to evaluate. Target word:', targetWord)
         const evaluation = evaluateGuess(currentGuess, targetWord)
         const newGuesses = [...guesses, { word: currentGuess, evaluation }]
 
