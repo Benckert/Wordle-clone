@@ -106,21 +106,37 @@ export const useGameStore = create<GameStore>()(
       submitGuess: async () => {
         const { currentGuess, targetWord, guesses, currentRow, stats } = get()
 
+        console.log("[submitGuess] Starting validation for:", currentGuess)
+
         // Validation: Check word length
-        if (currentGuess.length !== WORD_LENGTH) return
+        if (currentGuess.length !== WORD_LENGTH) {
+          console.log("[submitGuess] Word length invalid")
+          return
+        }
 
         // Set validating state
+        console.log("[submitGuess] Setting isValidating to true")
         set({ isValidating: true })
 
-        // Validation: Check if word is in dictionary (async API call)
-        const isValid = await isValidWord(currentGuess)
+        try {
+          // Validation: Check if word is in dictionary (async API call)
+          console.log("[submitGuess] Calling isValidWord API...")
+          const isValid = await isValidWord(currentGuess)
+          console.log("[submitGuess] API returned:", isValid)
 
-        // Clear validating state
-        set({ isValidating: false })
-
-        if (!isValid) {
-          set({ invalidWord: true })
-          // Auto-clear invalid word flag after animation
+          if (!isValid) {
+            console.log("[submitGuess] Word is invalid, setting states")
+            set({ invalidWord: true, isValidating: false })
+            // Auto-clear invalid word flag after animation
+            setTimeout(() => {
+              console.log("[submitGuess] Clearing invalidWord flag")
+              set({ invalidWord: false })
+            }, 400)
+            return
+          }
+        } catch (error) {
+          console.error("[submitGuess] Error validating word:", error)
+          set({ invalidWord: true, isValidating: false })
           setTimeout(() => set({ invalidWord: false }), 400)
           return
         }
@@ -156,6 +172,7 @@ export const useGameStore = create<GameStore>()(
         }
 
         // Update state
+        console.log("[submitGuess] Word is valid, updating game state")
         set({
           guesses: newGuesses,
           currentGuess: "",
@@ -163,7 +180,9 @@ export const useGameStore = create<GameStore>()(
           gameStatus: newGameStatus,
           stats: newStats,
           showStats: hasWon || hasLost,
+          isValidating: false,
         })
+        console.log("[submitGuess] State updated, isValidating set to false")
       },
 
       /**
