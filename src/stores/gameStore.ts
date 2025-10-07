@@ -8,11 +8,15 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getTodaysWord, isValidWord } from '@/utils/words';
-import { evaluateGuess, getKeyboardStatus, isWinningGuess } from '@/utils/gameLogic';
-import { WORD_LENGTH, MAX_ATTEMPTS } from '@/utils/constants';
-import { GameStatus } from '@/types/game.types';
-import type { GameStore, GameStats, KeyboardStatus } from '@/types/game.types';
+import { getTodaysWord, getRandomWord, isValidWord } from "@/utils/words"
+import {
+  evaluateGuess,
+  getKeyboardStatus,
+  isWinningGuess,
+} from "@/utils/gameLogic"
+import { WORD_LENGTH, MAX_ATTEMPTS } from "@/utils/constants"
+import { GameStatus } from "@/types/game.types"
+import type { GameStore, GameStats, KeyboardStatus } from "@/types/game.types"
 
 /**
  * Initial statistics state
@@ -23,11 +27,11 @@ const initialStats: GameStats = {
   currentStreak: 0,
   maxStreak: 0,
   distribution: [0, 0, 0, 0, 0, 0],
-};
+}
 
 /**
  * Game Store
- * 
+ *
  * Central state management for the entire Wordle game.
  * Handles all game logic, state updates, and persistence.
  */
@@ -199,12 +203,14 @@ export const useGameStore = create<GameStore>()(
        * Reset the game
        *
        * Resets all game state to initial values.
-       * Gets a new target word (useful for testing or "play again").
+       * Gets a new random word for "play again" functionality.
        * Statistics are preserved.
        */
       resetGame: () => {
+        const newWord = getRandomWord()
+        console.log("[resetGame] New target word selected:", newWord)
         set({
-          targetWord: getTodaysWord(),
+          targetWord: newWord,
           currentGuess: "",
           guesses: [],
           currentRow: 0,

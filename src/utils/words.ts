@@ -168,6 +168,17 @@ export const getTodaysWord = (): string => {
 };
 
 /**
+ * Get a random word for practice mode
+ * Returns a different random word each time it's called
+ * 
+ * @returns {string} Random word in uppercase
+ */
+export const getRandomWord = (): string => {
+  const index = Math.floor(Math.random() * ANSWER_WORDS.length);
+  return ANSWER_WORDS[index].toUpperCase();
+};
+
+/**
  * Check if a word is valid using Dictionary API
  * 
  * Uses the Free Dictionary API to validate any 5-letter English word.
