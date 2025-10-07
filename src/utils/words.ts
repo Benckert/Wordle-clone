@@ -1,13 +1,19 @@
 /**
  * Word List and Validation
  * 
- * This file contains the valid word lists and word validation functions.
- * For MVP, we use a curated list of common 5-letter words.
+ * This file contains word validation using Dictionary API and answer word lists.
+ * Uses Free Dictionary API for validating any 5-letter English word.
  */
 
 /**
- * Valid guesses - words that can be entered
- * This is a subset for MVP. In production, this would include 10,000+ words
+ * Cache for validated words to minimize API calls
+ * Stores words that have been checked (both valid and invalid)
+ */
+const wordValidationCache = new Map<string, boolean>();
+
+/**
+ * Fallback valid guesses - words that can be entered
+ * Used as fallback if API is unavailable or for offline mode
  */
 export const VALID_GUESSES: readonly string[] = [
   'ABOUT', 'ABOVE', 'ABUSE', 'ACTOR', 'ACUTE', 'ADMIT', 'ADOPT', 'ADULT',
@@ -162,12 +168,55 @@ export const getTodaysWord = (): string => {
 };
 
 /**
- * Check if a word is valid
- * Validates that the word exists in the valid guesses list
+ * Check if a word is valid using Dictionary API
+ * 
+ * Uses the Free Dictionary API to validate any 5-letter English word.
+ * Falls back to local word list if API is unavailable.
+ * Results are cached to minimize API calls.
+ * 
+ * @param {string} word - The word to validate
+ * @returns {Promise<boolean>} True if word is valid, false otherwise
+ */
+export const isValidWord = async (word: string): Promise<boolean> => {
+  const upperWord = word.toUpperCase();
+  
+  // Check cache first
+  if (wordValidationCache.has(upperWord)) {
+    return wordValidationCache.get(upperWord)!;
+  }
+  
+  try {
+    // Try Dictionary API first
+    const response = await fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`,
+      { 
+        signal: AbortSignal.timeout(3000) // 3 second timeout
+      }
+    );
+    
+    const isValid = response.ok;
+    
+    // Cache the result
+    wordValidationCache.set(upperWord, isValid);
+    
+    return isValid;
+  } catch (error) {
+    // If API fails, fall back to local word list
+    console.warn('Dictionary API unavailable, using fallback list', error);
+    const isValid = VALID_GUESSES.includes(upperWord as typeof VALID_GUESSES[number]);
+    wordValidationCache.set(upperWord, isValid);
+    return isValid;
+  }
+};
+
+/**
+ * Check if a word is valid (synchronous version for fallback)
+ * Uses only the local word list
  * 
  * @param {string} word - The word to validate
  * @returns {boolean} True if word is valid, false otherwise
+ * @deprecated Use isValidWord() instead for API validation
  */
-export const isValidWord = (word: string): boolean => {
+export const isValidWordSync = (word: string): boolean => {
   return VALID_GUESSES.includes(word.toUpperCase() as typeof VALID_GUESSES[number]);
 };

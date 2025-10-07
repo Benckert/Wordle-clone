@@ -35,9 +35,9 @@ export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       // ============= INITIAL STATE =============
-      
+
       targetWord: getTodaysWord(),
-      currentGuess: '',
+      currentGuess: "",
       guesses: [],
       currentRow: 0,
       gameStatus: GameStatus.PLAYING,
@@ -45,55 +45,56 @@ export const useGameStore = create<GameStore>()(
       showStats: false,
       showHelp: false,
       invalidWord: false,
+      isValidating: false,
 
       // ============= ACTIONS =============
 
       /**
        * Add a letter to the current guess
-       * 
+       *
        * Only adds if:
        * - Game is still in PLAYING state
        * - Current guess is less than WORD_LENGTH
-       * 
+       *
        * @param {string} letter - Letter to add (automatically uppercased)
        */
       addLetter: (letter: string) => {
-        const { currentGuess, gameStatus } = get();
-        if (gameStatus !== GameStatus.PLAYING) return;
+        const { currentGuess, gameStatus } = get()
+        if (gameStatus !== GameStatus.PLAYING) return
         if (currentGuess.length < WORD_LENGTH) {
-          set({ 
-            currentGuess: currentGuess + letter.toUpperCase(), 
-            invalidWord: false 
-          });
+          set({
+            currentGuess: currentGuess + letter.toUpperCase(),
+            invalidWord: false,
+          })
         }
       },
 
       /**
        * Delete the last letter from the current guess
-       * 
+       *
        * Only deletes if:
        * - Game is still in PLAYING state
        * - There are letters to delete
        */
       deleteLetter: () => {
-        const { currentGuess, gameStatus } = get();
-        if (gameStatus !== GameStatus.PLAYING) return;
-        set({ 
-          currentGuess: currentGuess.slice(0, -1), 
-          invalidWord: false 
-        });
+        const { currentGuess, gameStatus } = get()
+        if (gameStatus !== GameStatus.PLAYING) return
+        set({
+          currentGuess: currentGuess.slice(0, -1),
+          invalidWord: false,
+        })
       },
 
       /**
        * Submit the current guess
-       * 
+       *
        * Validates the guess, evaluates it, updates game state,
        * and checks for win/loss conditions.
-       * 
+       *
        * Validation checks:
        * 1. Guess must be exactly WORD_LENGTH characters
-       * 2. Guess must be in the valid words list
-       * 
+       * 2. Guess must be in the dictionary (checked via API)
+       *
        * If guess is valid:
        * 1. Evaluates guess against target word
        * 2. Adds guess to guesses array
@@ -102,71 +103,82 @@ export const useGameStore = create<GameStore>()(
        * 5. Updates statistics if game ends
        * 6. Shows stats modal if game ends
        */
-      submitGuess: () => {
-        const { currentGuess, targetWord, guesses, currentRow, stats } = get();
+      submitGuess: async () => {
+        const { currentGuess, targetWord, guesses, currentRow, stats } = get()
 
         // Validation: Check word length
-        if (currentGuess.length !== WORD_LENGTH) return;
-        
-        // Validation: Check if word is in dictionary
-        if (!isValidWord(currentGuess)) {
-          set({ invalidWord: true });
+        if (currentGuess.length !== WORD_LENGTH) return
+
+        // Set validating state
+        set({ isValidating: true })
+
+        // Validation: Check if word is in dictionary (async API call)
+        const isValid = await isValidWord(currentGuess)
+
+        // Clear validating state
+        set({ isValidating: false })
+
+        if (!isValid) {
+          set({ invalidWord: true })
           // Auto-clear invalid word flag after animation
-          setTimeout(() => set({ invalidWord: false }), 400);
-          return;
+          setTimeout(() => set({ invalidWord: false }), 400)
+          return
         }
 
         // Evaluate the guess
-        const evaluation = evaluateGuess(currentGuess, targetWord);
-        const newGuesses = [...guesses, { word: currentGuess, evaluation }];
+        const evaluation = evaluateGuess(currentGuess, targetWord)
+        const newGuesses = [...guesses, { word: currentGuess, evaluation }]
 
         // Check win/loss conditions
-        const hasWon = isWinningGuess(evaluation);
-        const hasLost = currentRow >= MAX_ATTEMPTS - 1 && !hasWon;
+        const hasWon = isWinningGuess(evaluation)
+        const hasLost = currentRow >= MAX_ATTEMPTS - 1 && !hasWon
 
-        let newGameStatus = GameStatus.PLAYING;
-        const newStats = { ...stats };
+        let newGameStatus = GameStatus.PLAYING
+        const newStats = { ...stats }
 
         // Handle win condition
         if (hasWon) {
-          newGameStatus = GameStatus.WON;
-          newStats.played++;
-          newStats.won++;
-          newStats.currentStreak++;
-          newStats.maxStreak = Math.max(newStats.maxStreak, newStats.currentStreak);
-          newStats.distribution[currentRow]++;
-        } 
+          newGameStatus = GameStatus.WON
+          newStats.played++
+          newStats.won++
+          newStats.currentStreak++
+          newStats.maxStreak = Math.max(
+            newStats.maxStreak,
+            newStats.currentStreak
+          )
+          newStats.distribution[currentRow]++
+        }
         // Handle loss condition
         else if (hasLost) {
-          newGameStatus = GameStatus.LOST;
-          newStats.played++;
-          newStats.currentStreak = 0;
+          newGameStatus = GameStatus.LOST
+          newStats.played++
+          newStats.currentStreak = 0
         }
 
         // Update state
         set({
           guesses: newGuesses,
-          currentGuess: '',
+          currentGuess: "",
           currentRow: currentRow + 1,
           gameStatus: newGameStatus,
           stats: newStats,
           showStats: hasWon || hasLost,
-        });
+        })
       },
 
       /**
        * Get keyboard status for all letters
-       * 
+       *
        * @returns {KeyboardStatus} Map of letters to their status
        */
       getKeyboardStatus: (): KeyboardStatus => {
-        const { guesses } = get();
-        return getKeyboardStatus(guesses);
+        const { guesses } = get()
+        return getKeyboardStatus(guesses)
       },
 
       /**
        * Reset the game
-       * 
+       *
        * Resets all game state to initial values.
        * Gets a new target word (useful for testing or "play again").
        * Statistics are preserved.
@@ -174,13 +186,14 @@ export const useGameStore = create<GameStore>()(
       resetGame: () => {
         set({
           targetWord: getTodaysWord(),
-          currentGuess: '',
+          currentGuess: "",
           guesses: [],
           currentRow: 0,
           gameStatus: GameStatus.PLAYING,
           invalidWord: false,
+          isValidating: false,
           showStats: false,
-        });
+        })
       },
 
       /**
@@ -194,12 +207,12 @@ export const useGameStore = create<GameStore>()(
       toggleHelp: () => set((state) => ({ showHelp: !state.showHelp })),
     }),
     {
-      name: 'wordle-game-storage',
+      name: "wordle-game-storage",
       // Only persist statistics to localStorage
       // Game state resets on each session
-      partialize: (state) => ({ 
-        stats: state.stats 
+      partialize: (state) => ({
+        stats: state.stats,
       }),
     }
   )
-);
+)

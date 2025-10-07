@@ -52,15 +52,16 @@ export interface GameStats {
  * Contains all game state properties
  */
 export interface GameState {
-  targetWord: string;
-  currentGuess: string;
-  guesses: Guess[];
-  currentRow: number;
-  gameStatus: GameStatus;
-  stats: GameStats;
-  showStats: boolean;
-  showHelp: boolean;
-  invalidWord: boolean;
+  targetWord: string
+  currentGuess: string
+  guesses: Guess[]
+  currentRow: number
+  gameStatus: GameStatus
+  stats: GameStats
+  showStats: boolean
+  showHelp: boolean
+  invalidWord: boolean
+  isValidating: boolean
 }
 
 /**
@@ -68,13 +69,13 @@ export interface GameState {
  * Contains all game action functions
  */
 export interface GameActions {
-  addLetter: (letter: string) => void;
-  deleteLetter: () => void;
-  submitGuess: () => void;
-  getKeyboardStatus: () => KeyboardStatus;
-  resetGame: () => void;
-  toggleStats: () => void;
-  toggleHelp: () => void;
+  addLetter: (letter: string) => void
+  deleteLetter: () => void
+  submitGuess: () => Promise<void>
+  getKeyboardStatus: () => KeyboardStatus
+  resetGame: () => void
+  toggleStats: () => void
+  toggleHelp: () => void
 }
 
 /**
