@@ -6,10 +6,10 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, BarChart3, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useGameStore } from '@/stores/gameStore';
-import { GameStatus } from '@/types/game.types';
+import { Trophy, BarChart3, RotateCcw, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useGameStore } from "@/stores/gameStore"
+import { GameStatus } from "@/types/game.types"
 import { useState, useEffect } from "react"
 
 /**
@@ -20,6 +20,7 @@ import { useState, useEffect } from "react"
  * - Trophy icon with animation
  * - "Play Again" button - resets current game
  * - "View Stats" button - opens statistics modal
+ * - Close button to dismiss overlay
  * - Fade-in animation
  * - Delayed appearance to allow tile animation to complete
  */
@@ -41,11 +42,16 @@ const WinOverlay: React.FC = () => {
   }, [gameStatus])
 
   const handleViewStats = () => {
+    setShowOverlay(false)
     toggleStats()
   }
 
   const handlePlayAgain = () => {
     resetGame()
+  }
+
+  const handleClose = () => {
+    setShowOverlay(false)
   }
 
   return (
@@ -58,6 +64,7 @@ const WinOverlay: React.FC = () => {
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{ backdropFilter: "blur(8px)" }}
+          onClick={handleClose}
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/30" />
@@ -69,7 +76,17 @@ const WinOverlay: React.FC = () => {
             exit={{ scale: 0.8, y: 20 }}
             transition={{ delay: 0.5, duration: 0.4, type: "spring" }}
             className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center"
+            onClick={(e) => e.stopPropagation()}
           >
+            {/* Close button */}
+            <button
+              onClick={handleClose}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              aria-label="Close overlay"
+            >
+              <X size={24} />
+            </button>
+
             {/* Trophy Icon */}
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
