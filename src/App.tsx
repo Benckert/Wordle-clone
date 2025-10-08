@@ -73,7 +73,7 @@ function App() {
    */
   useEffect(() => {
     if (invalidWord) {
-      toast.error("Not in word list", {
+      toast.error("Word not in dictionary", {
         duration: 2000,
       })
     }
