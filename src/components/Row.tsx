@@ -10,41 +10,44 @@ import { TileStatus } from '@/types/game.types';
 
 interface RowProps {
   /** The word for this row (empty string if not filled) */
-  word?: string;
+  word?: string
   /** Evaluation results for each letter (empty array if not evaluated) */
-  evaluation?: TileStatus[];
+  evaluation?: TileStatus[]
   /** Whether this is the currently active row */
-  isCurrentRow: boolean;
+  isCurrentRow: boolean
   /** Whether the current guess is invalid (triggers shake animation) */
-  isInvalid: boolean;
+  isInvalid: boolean
   /** Length of the word */
-  wordLength: number;
+  wordLength: number
+  /** Whether this is the most recently submitted row (triggers flip animation) */
+  isLastSubmittedRow: boolean
 }
 
 /**
  * Row Component
- * 
+ *
  * Renders a row of tiles based on wordLength, managing their display state based on
  * whether the row is empty, filled, or evaluated.
  */
-const Row: React.FC<RowProps> = ({ 
-  word = '', 
-  evaluation = [], 
-  isCurrentRow, 
+const Row: React.FC<RowProps> = ({
+  word = "",
+  evaluation = [],
+  isCurrentRow,
   isInvalid,
-  wordLength
+  wordLength,
+  isLastSubmittedRow,
 }) => {
   // Create array of tiles based on word length
-  const tiles: string[] = Array(wordLength).fill('');
-  
+  const tiles: string[] = Array(wordLength).fill("")
+
   // Fill in letters from the word
   for (let i = 0; i < wordLength; i++) {
-    tiles[i] = word[i] || '';
+    tiles[i] = word[i] || ""
   }
-  
+
   /**
    * Get the status for a tile at the given index
-   * 
+   *
    * Priority:
    * 1. If evaluated, use the evaluation status
    * 2. If filled but not evaluated, use FILLED status
@@ -52,13 +55,13 @@ const Row: React.FC<RowProps> = ({
    */
   const getTileStatus = (index: number): TileStatus => {
     if (evaluation[index]) {
-      return evaluation[index];
+      return evaluation[index]
     }
     if (tiles[index]) {
-      return TileStatus.FILLED;
+      return TileStatus.FILLED
     }
-    return TileStatus.EMPTY;
-  };
+    return TileStatus.EMPTY
+  }
 
   return (
     <div className="flex gap-1 justify-center mb-1">
@@ -70,10 +73,11 @@ const Row: React.FC<RowProps> = ({
           position={index}
           isInvalid={isInvalid && isCurrentRow}
           wordLength={wordLength}
+          shouldAnimate={isLastSubmittedRow}
         />
       ))}
     </div>
-  );
-};
+  )
+}
 
 export default Row;

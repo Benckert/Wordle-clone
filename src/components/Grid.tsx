@@ -44,6 +44,7 @@ const Grid: React.FC = () => {
               isCurrentRow={false}
               isInvalid={false}
               wordLength={wordLength}
+              isLastSubmittedRow={index === guesses.length - 1}
             />
           )
         }
@@ -57,6 +58,7 @@ const Grid: React.FC = () => {
               isCurrentRow={true}
               isInvalid={invalidWord || insufficientLetters}
               wordLength={wordLength}
+              isLastSubmittedRow={false}
             />
           )
         }
@@ -70,6 +72,7 @@ const Grid: React.FC = () => {
               isCurrentRow={false}
               isInvalid={false}
               wordLength={wordLength}
+              isLastSubmittedRow={false}
             />
           )
         }

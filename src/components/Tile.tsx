@@ -19,6 +19,8 @@ interface TileProps {
   isInvalid: boolean
   /** Word length to determine tile size */
   wordLength?: number
+  /** Whether this tile should animate (only for last submitted row) */
+  shouldAnimate?: boolean
 }
 
 /**
@@ -37,6 +39,7 @@ const Tile: React.FC<TileProps> = ({
   position,
   isInvalid,
   wordLength = 5,
+  shouldAnimate = false,
 }) => {
   /**
    * Get size classes based on word length
@@ -88,26 +91,30 @@ const Tile: React.FC<TileProps> = ({
         font-bold uppercase rounded
         ${getBackgroundColor()} ${getTextColor()}
       `}
+      key={`${letter}-${status}-${position}`}
       initial={{ scale: 1 }}
       animate={{
-        // Pop animation when letter is entered
+        // Pop animation when letter is entered on current row
         scale: letter && status === TileStatus.FILLED ? [1, 1.1, 1] : 1,
 
-        // Flip animation when tile is evaluated
-        rotateX:
-          status !== TileStatus.EMPTY && status !== TileStatus.FILLED
-            ? [0, 90, 0]
-            : 0,
+        // Staggered bounce animation only for the last submitted row
+        ...(shouldAnimate &&
+          status !== TileStatus.EMPTY &&
+          status !== TileStatus.FILLED && {
+            scale: [1, 1.2, 1],
+          }),
 
         // Shake animation for invalid word
         x: isInvalid ? [0, -10, 10, -10, 10, 0] : 0,
       }}
       transition={{
-        scale: { duration: 0.1 },
-        rotateX: {
-          duration: 0.6,
-          delay: position * 0.1, // Stagger the flip animation
-        },
+        scale: shouldAnimate
+          ? {
+              duration: 0.25,
+              delay: position * 0.06, // Faster stagger
+              ease: [0.175, 0.885, 0.32, 1.275], // Bouncy easing
+            }
+          : { duration: 0.1 },
         x: { duration: 0.4 },
       }}
     >
