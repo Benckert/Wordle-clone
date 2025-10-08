@@ -84,6 +84,19 @@ const Tile: React.FC<TileProps> = ({
       : "text-white"
   }
 
+  // Calculate stagger delay with consistent time per tile
+  // 7-letter words: 0.5s total, animation duration = 0.25s
+  // Available time for stagger = 0.5 - 0.25 = 0.25s
+  // Time per tile gap = 0.25 / 6 = 0.04167s
+  // Shorter words use same time per tile, so they finish faster
+  const getStaggerDelay = (): number => {
+    const animationDuration = 0.25
+    const sevenLetterTotalTime = 0.5
+    const sevenLetterStaggerTime = sevenLetterTotalTime - animationDuration
+    const timePerTileGap = sevenLetterStaggerTime / 6 // 6 gaps in 7-letter word
+    return position * timePerTileGap
+  }
+
   return (
     <motion.div
       className={`
@@ -111,7 +124,7 @@ const Tile: React.FC<TileProps> = ({
         scale: shouldAnimate
           ? {
               duration: 0.25,
-              delay: position * 0.06, // Faster stagger
+              delay: getStaggerDelay(),
               ease: [0.175, 0.885, 0.32, 1.275], // Bouncy easing
             }
           : { duration: 0.1 },
