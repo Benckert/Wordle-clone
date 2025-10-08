@@ -10,10 +10,11 @@ import { XCircle, BarChart3, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGameStore } from '@/stores/gameStore';
 import { GameStatus } from '@/types/game.types';
+import { useState, useEffect } from "react"
 
 /**
  * LoseOverlay Component
- * 
+ *
  * Features:
  * - Blurred background overlay
  * - X icon with animation
@@ -21,31 +22,47 @@ import { GameStatus } from '@/types/game.types';
  * - "Play Again" button - resets current game
  * - "View Stats" button - opens statistics modal
  * - Fade-in animation
+ * - Delayed appearance to allow tile animation to complete
  */
 const LoseOverlay: React.FC = () => {
-  const { gameStatus, resetGame, toggleStats, wordLength, gameStates } = useGameStore();
-  
-  const currentGame = gameStates[wordLength];
-  const targetWord = currentGame?.targetWord || '';
+  const { gameStatus, resetGame, toggleStats, wordLength, gameStates } =
+    useGameStore()
+  const [showOverlay, setShowOverlay] = useState(false)
+
+  const currentGame = gameStates[wordLength]
+  const targetWord = currentGame?.targetWord || ""
+
+  // Delay showing overlay to let tile animation complete
+  // Animation takes ~0.5s, add 0.5s breathing room = 1.0s total delay
+  useEffect(() => {
+    if (gameStatus === GameStatus.LOST) {
+      const timer = setTimeout(() => {
+        setShowOverlay(true)
+      }, 1000)
+      return () => clearTimeout(timer)
+    } else {
+      setShowOverlay(false)
+    }
+  }, [gameStatus])
 
   const handleViewStats = () => {
-    toggleStats();
-  };
+    toggleStats()
+  }
 
   const handlePlayAgain = () => {
-    resetGame();
-  };
+    resetGame()
+  }
 
   return (
     <AnimatePresence>
-      {gameStatus === GameStatus.LOST && (
+      {showOverlay && gameStatus === GameStatus.LOST && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ backdropFilter: 'blur(8px)' }}
+          style={{ backdropFilter: "blur(8px)" }}
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/30" />
@@ -55,18 +72,26 @@ const LoseOverlay: React.FC = () => {
             initial={{ scale: 0.8, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.8, y: 20 }}
-            transition={{ delay: 0.5, duration: 0.4, type: 'spring' }}
+            transition={{ delay: 0.5, duration: 0.4, type: "spring" }}
             className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center"
           >
             {/* X Icon */}
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.7, duration: 0.5, type: 'spring', bounce: 0.5 }}
+              transition={{
+                delay: 0.7,
+                duration: 0.5,
+                type: "spring",
+                bounce: 0.5,
+              }}
               className="flex justify-center mb-6"
             >
               <div className="bg-gradient-to-br from-red-400 to-red-600 rounded-full p-6">
-                <XCircle size={48} className="text-white" />
+                <XCircle
+                  size={48}
+                  className="text-white"
+                />
               </div>
             </motion.div>
 
@@ -112,7 +137,10 @@ const LoseOverlay: React.FC = () => {
                 onClick={handlePlayAgain}
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white py-6 text-lg font-semibold"
               >
-                <RotateCcw size={20} className="mr-2" />
+                <RotateCcw
+                  size={20}
+                  className="mr-2"
+                />
                 Play Again
               </Button>
 
@@ -122,7 +150,10 @@ const LoseOverlay: React.FC = () => {
                 variant="outline"
                 className="w-full py-6 text-lg font-semibold"
               >
-                <BarChart3 size={20} className="mr-2" />
+                <BarChart3
+                  size={20}
+                  className="mr-2"
+                />
                 View Stats
               </Button>
             </motion.div>
@@ -130,7 +161,7 @@ const LoseOverlay: React.FC = () => {
         </motion.div>
       )}
     </AnimatePresence>
-  );
-};
+  )
+}
 
 export default LoseOverlay;
