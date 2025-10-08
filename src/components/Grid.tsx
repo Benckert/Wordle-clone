@@ -19,8 +19,14 @@ import { MAX_ATTEMPTS } from '@/utils/constants';
  * 3. Empty - not yet reached
  */
 const Grid: React.FC = () => {
-  const { guesses, currentGuess, currentRow, invalidWord, wordLength } =
-    useGameStore()
+  const {
+    guesses,
+    currentGuess,
+    currentRow,
+    invalidWord,
+    insufficientLetters,
+    wordLength,
+  } = useGameStore()
 
   // Create array for all 6 rows
   const rows = Array(MAX_ATTEMPTS).fill(null)
@@ -49,7 +55,7 @@ const Grid: React.FC = () => {
               word={currentGuess}
               evaluation={[]}
               isCurrentRow={true}
-              isInvalid={invalidWord}
+              isInvalid={invalidWord || insufficientLetters}
               wordLength={wordLength}
             />
           )

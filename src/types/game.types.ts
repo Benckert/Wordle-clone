@@ -61,6 +61,7 @@ export interface GameState {
   showStats: boolean
   showHelp: boolean
   invalidWord: boolean
+  insufficientLetters: boolean
   isValidating: boolean
   wordLength: number
   // Separate game states for each word length

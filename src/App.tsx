@@ -35,6 +35,7 @@ function App() {
     submitGuess,
     gameStatus,
     invalidWord,
+    insufficientLetters,
     toggleHelp,
   } = useGameStore()
 
@@ -77,6 +78,19 @@ function App() {
       })
     }
   }, [invalidWord])
+
+  /**
+   * Insufficient Letters Toast Notification
+   *
+   * Shows error message when player tries to submit incomplete word
+   */
+  useEffect(() => {
+    if (insufficientLetters) {
+      toast.error("Not enough letters", {
+        duration: 2000,
+      })
+    }
+  }, [insufficientLetters])
 
   /**
    * First Visit Help Modal
