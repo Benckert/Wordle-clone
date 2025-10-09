@@ -26,7 +26,10 @@ const Grid: React.FC = () => {
     invalidWord,
     insufficientLetters,
     wordLength,
+    targetWord,
   } = useGameStore()
+
+  console.log("[Grid] Render:", { guesses, currentGuess, currentRow })
 
   // Create array for all 6 rows
   const rows = Array(MAX_ATTEMPTS).fill(null)
@@ -38,7 +41,7 @@ const Grid: React.FC = () => {
         if (index < guesses.length) {
           return (
             <Row
-              key={index}
+              key={`${targetWord}-${index}`}
               word={guesses[index].word}
               evaluation={guesses[index].evaluation}
               isCurrentRow={false}
@@ -52,7 +55,7 @@ const Grid: React.FC = () => {
         else if (index === currentRow) {
           return (
             <Row
-              key={index}
+              key={`${targetWord}-${index}`}
               word={currentGuess}
               evaluation={[]}
               isCurrentRow={true}
@@ -66,7 +69,7 @@ const Grid: React.FC = () => {
         else {
           return (
             <Row
-              key={index}
+              key={`${targetWord}-${index}`}
               word=""
               evaluation={[]}
               isCurrentRow={false}
