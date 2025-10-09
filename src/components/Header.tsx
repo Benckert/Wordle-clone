@@ -5,19 +5,12 @@
  * Displays the Wordle logo/title.
  */
 
-import { HelpCircle, BarChart3, RotateCcw } from "lucide-react"
+import { HelpCircle, BarChart3, RotateCcw, AlertCircle } from "lucide-react"
 import { useGameStore } from "@/stores/gameStore"
 import { WORD_LENGTHS } from "@/utils/constants"
 import { GameStatus } from "@/types/game.types"
 import { useState } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 
 /**
@@ -157,29 +150,75 @@ const Header: React.FC = () => {
       </header>
 
       {/* Confirmation Dialog */}
-      <Dialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Restart Game?</DialogTitle>
-            <DialogDescription>
-              You have a game in progress. Are you sure you want to start a new
-              game? Your current progress will be lost.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowConfirmDialog(false)}
+      <AnimatePresence>
+        {showConfirmDialog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ backdropFilter: "blur(8px)" }}
+            onClick={() => setShowConfirmDialog(false)}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/30" />
+
+            {/* Content */}
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ duration: 0.2, type: "spring" }}
+              className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center"
+              onClick={(e) => e.stopPropagation()}
             >
-              Cancel
-            </Button>
-            <Button onClick={handleConfirmRestart}>Restart</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              {/* Icon */}
+              <div className="flex justify-center mb-6">
+                <div className="bg-gradient-to-br from-amber-400 to-amber-600 rounded-full p-6">
+                  <AlertCircle
+                    size={48}
+                    className="text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                Restart Game?
+              </h2>
+
+              {/* Description */}
+              <p className="text-gray-600 dark:text-gray-400 mb-8">
+                You have a game in progress. Are you sure you want to start a
+                new game? Your current progress will be lost.
+              </p>
+
+              {/* Buttons */}
+              <div className="flex flex-col gap-3">
+                <Button
+                  onClick={handleConfirmRestart}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white py-6 text-lg font-semibold"
+                >
+                  <RotateCcw
+                    size={20}
+                    className="mr-2"
+                  />
+                  Yes, Restart
+                </Button>
+
+                <Button
+                  onClick={() => setShowConfirmDialog(false)}
+                  variant="outline"
+                  className="w-full py-6 text-lg font-semibold"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
